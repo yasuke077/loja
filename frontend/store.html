@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StellaxSec - Loja Segura</title>
+    <link rel="stylesheet" href="store.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>StellaxSec</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="index.html#services">Serviços</a></li>
+                    <li><a href="index.html#about">Sobre</a></li>
+                    <li><a href="index.html#contact">Contato</a></li>
+                    <li><a href="store.html" class="store-btn active">Loja</a></li>
+                </ul>
+                <div class="cart-icon" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cartCount" class="cart-count">0</span>
+                </div>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero da Loja -->
+    <section class="store-hero">
+        <div class="hero-content">
+            <h1>Loja Segura StellaxSec</h1>
+            <p>Produtos premium de cibersegurança para profissionais e entusiastas</p>
+            <div class="security-badges">
+                <span class="badge"><i class="fas fa-shield-check"></i> Pagamento Seguro</span>
+                <span class="badge"><i class="fas fa-download"></i> Download Imediato</span>
+                <span class="badge"><i class="fas fa-headset"></i> Suporte 24/7</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filtros -->
+    <section class="filters">
+        <div class="container">
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterProducts('all')">Todos</button>
+                <button class="filter-btn" onclick="filterProducts('Cursos')">Cursos</button>
+                <button class="filter-btn" onclick="filterProducts('E-books')">E-books</button>
+                <button class="filter-btn" onclick="filterProducts('Ferramentas')">Ferramentas</button>
+                <button class="filter-btn" onclick="filterProducts('Consultoria')">Consultoria</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Produtos -->
+    <section class="products">
+        <div class="container">
+            <div id="productsContainer" class="loading">
+                <i class="fas fa-spinner"></i>
+                <p>Carregando produtos...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Carrinho -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-cart"></i> Carrinho</h3>
+            <button class="close-cart" onclick="toggleCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="cartItems" class="cart-items">
+            <p class="empty-cart">Seu carrinho está vazio</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <strong>Total: R$ <span id="cartTotal">0.00</span></strong>
+            </div>
+            <button id="checkoutBtn" class="checkout-btn" onclick="checkout()" disabled>
+                <i class="fas fa-credit-card"></i> Finalizar Compra
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Checkout -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-credit-card"></i> Finalizar Compra</h3>
+                <button class="close-modal" onclick="closeCheckoutModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label for="customerName">Nome Completo:</label>
+                        <input type="text" id="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customerEmail">Email:</label>
+                        <input type="email" id="customerEmail" required>
+                    </div>
+                    <div class="order-summary">
+                        <h4>Resumo do Pedido:</h4>
+                        <div id="orderItems"></div>
+                        <div class="order-total">
+                            <strong>Total: R$ <span id="orderTotal">0.00</span></strong>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-qrcode"></i> Gerar PIX
+                    </button>
+                </form>
+                <div id="checkoutAlert"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Pagamento PIX -->
+    <div id="pixModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-qrcode"></i> Pagamento PIX</h3>
+                <button class="close-modal" onclick="closePixModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="pix-container">
+                    <div class="pix-info">
+                        <h4>Escaneie o QR Code ou copie a chave PIX:</h4>
+                        <div id="pixQrCode" class="qr-code-placeholder">
+                            <i class="fas fa-qrcode"></i>
+                            <p>QR Code será exibido aqui</p>
+                        </div>
+                        <div class="pix-key">
+                            <input type="text" id="pixKey" readonly>
+                            <button onclick="copyPixKey()" class="copy-btn">
+                                <i class="fas fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                        <div class="pix-amount">
+                            <strong>Valor: R$ <span id="pixAmount">0.00</span></strong>
+                        </div>
+                    </div>
+                    <div class="payment-status">
+                        <div class="status-waiting">
+                            <i class="fas fa-clock"></i>
+                            <p>Aguardando pagamento...</p>
+                            <small>O pagamento será confirmado automaticamente</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>StellaxSec</span>
+                    </div>
+                    <p>Protegendo seu mundo digital com excelência e inovação.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Links Rápidos</h3>
+                    <ul>
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="index.html#services">Serviços</a></li>
+                        <li><a href="index.html#about">Sobre</a></li>
+                        <li><a href="index.html#contact">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Segurança</h3>
+                    <div class="security-info">
+                        <p><i class="fas fa-lock"></i> Pagamentos seguros via PIX</p>
+                        <p><i class="fas fa-shield-check"></i> SSL/TLS Criptografado</p>
+                        <p><i class="fas fa-download"></i> Downloads protegidos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StellaxSec. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="store.js"></script>
+</body>
+</html>
+
